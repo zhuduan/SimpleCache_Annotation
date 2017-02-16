@@ -3,7 +3,7 @@ package org.zhuduan.cache.storage;
 /***
  * 
  * 缓存接口，定义了具体的缓存调用方法:
- * 具体存储可以通过redis、memcache、或者JVM的堆进行实现
+ * 具体存储可以通过redis、memcache、或者local内存（或者guava）进行实现
  * （具体使用哪个实现会由工厂类决定）
  * 
  * 
