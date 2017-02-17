@@ -11,14 +11,24 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.stereotype.Component;
 import org.zhuduan.cache.storage.CacheStorageService;
+import org.zhuduan.cache.storage.impl.local.CacheStorageServiceLocalImpl;
+import org.zhuduan.cache.storage.impl.redis.CacheStorageServiceRedisImpl;
+import org.zhuduan.utils.CacheException;
 import org.zhuduan.utils.Log4jUtil;
 import org.zhuduan.utils.SerializeUtils;
+
+import redis.clients.jedis.JedisCluster;
 
 
 /***
  * 
  * 配置@SimpleCache 注解的切面, 在方法上使用了@SimpleCache表示就使用了该切面 
  * 切面使用了Around的方式
+ * 
+ * 在使用时，会根据构造器的传入参数来重载不同的构造器，从而使用不同的CacheStorageServiceImpl实例
+ * CacheStorageServiceImpl实例会采用不同的实现方式
+ *     CacheStorageServiceLocalImpl -> 采用本地的ConcurrentHashMap实现缓存 （默认方式）
+ *     CacheStorageServiceRedisImpl -> 采用Redis来实现缓存
  * 
  * 
  * @author	zhuhaifeng
@@ -31,8 +41,49 @@ public class SimpleCacheAspect {
 	
 	private static final Logger cacheLog = Log4jUtil.cacheLog;	
 	
-    private CacheStorageService cacheStorageService;
-	
+    private volatile static CacheStorageService cacheStorageService;			// 实际上用于缓存存储的实例类        
+    
+    
+    /***
+     * 采用默认实现方式的构造器
+     * 
+     */
+    public SimpleCacheAspect(){
+    	// 用双重锁来防止线程不安全问题
+    	if ( cacheStorageService == null ) {                         
+            synchronized (SimpleCacheAspect.class) {
+                if ( cacheStorageService == null ) {       
+                	cacheStorageService = CacheStorageServiceLocalImpl.getInstance();
+                	cacheLog.info("成功创建CacheStorageServiceLocalImpl");
+                }
+            }
+        }
+    }
+    
+    
+    /***
+     * 采用Redis实现的构造器
+     * 
+     * @param jedisCluster
+     */
+    public SimpleCacheAspect(JedisCluster jedisCluster){
+    	// 用双重锁来防止线程不安全问题
+    	if ( cacheStorageService == null ) {                         
+            synchronized (SimpleCacheAspect.class) {
+                if ( cacheStorageService == null ) {       
+                	try{
+                		cacheStorageService = CacheStorageServiceRedisImpl.getInstance(jedisCluster);
+                		cacheLog.info("成功创建CacheStorageServiceRedisImpl");
+                	} catch(CacheException cacheException){
+                		// 如果初始化错误则使用默认的实现来实现缓存方法，防止出错导致奔溃
+            			cacheStorageService = CacheStorageServiceLocalImpl.getInstance();
+            			cacheLog.warn("由于"+cacheException.getErrMessage()+", 降级采用默认CacheStorageServiceLocalImpl");
+                	}
+                }
+            }
+        }
+    }
+    
 	
 	/** 
 	 * 以@SimpleCache 注解作为aop切点
@@ -68,6 +119,7 @@ public class SimpleCacheAspect {
 			final Object cacheObj = SerializeUtils.deserialize(cacheValue, cacheClazz);
 			final long time_2 = System.currentTimeMillis();
 			cacheLog.info("hit cacheKey:" + cacheKey + ", cacheValueAlready:" + cacheValue+", ms:" + (time_2-time_1));
+			System.out.println("hit cacheKey:" + cacheKey + ", cacheValueAlready:" + cacheValue+", ms:" + (time_2-time_1));
 			return cacheObj;
 		} 
 		
@@ -90,18 +142,10 @@ public class SimpleCacheAspect {
 			final long time_5 = System.currentTimeMillis();
 			cacheLog.info("set cacheKey:" + cacheKey+", cacheValueSave:"+cacheValueSave + ", expire s:" + expire 
 						+ ", setCache ms:" + (time_5 - time_4) + ", db ms:" + (time_4 - time_3));
+			System.out.println("set cacheKey:" + cacheKey+", cacheValueSave:"+cacheValueSave + ", expire s:" + expire 
+						+ ", setCache ms:" + (time_5 - time_4) + ", db ms:" + (time_4 - time_3));
 		}
 		return dbExecuteValue;
-	}
-	
-	
-	public CacheStorageService getCacheStorageService() {
-		return cacheStorageService;
-	}
-
-
-	public void setCacheStorageService(CacheStorageService cacheStorageService) {
-		this.cacheStorageService = cacheStorageService;
 	}
 
 	/**

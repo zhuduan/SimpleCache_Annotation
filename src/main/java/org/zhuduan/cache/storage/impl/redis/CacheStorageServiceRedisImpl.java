@@ -4,6 +4,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Service;
 import org.zhuduan.cache.storage.CacheStorageService;
+import org.zhuduan.utils.CacheConstants;
+import org.zhuduan.utils.CacheException;
 import org.zhuduan.utils.Log4jUtil;
 
 import redis.clients.jedis.JedisCluster;
@@ -22,11 +24,35 @@ public class CacheStorageServiceRedisImpl implements CacheStorageService{
 	
 	private static final Logger		sysLog		=	Log4jUtil.sysLog;		// 系统日志
 	private static final Logger		svcLog		=	Log4jUtil.svcLog;		// service日志
+
+	private JedisCluster jedisCluster;										// 实际操作Redis的Jedis对象
+	
+	private volatile static CacheStorageServiceRedisImpl INSTANCE; 			// 声明成 volatile 的实例
 	
 	
-	private boolean useCache	= 	true;					// 是否使用缓存
-	
-	private JedisCluster jedisCluster;
+	/***
+	 * 通过单例模式来获取CacheStorageServiceRedisImpl的实例
+	 * 如果没有传入jedisCluster对象则抛出 CacheException
+	 * 
+	 * @param jedisCluster
+	 * @return
+	 * @throws CacheException
+	 */
+    public static CacheStorageServiceRedisImpl getInstance(JedisCluster jedisCluster) throws CacheException {
+        // 二重锁检验，来防止多线程导致的线程安全问题
+    	if (INSTANCE == null) {                         
+            synchronized (CacheStorageServiceRedisImpl.class) {
+                if (INSTANCE == null) {       
+                	if (jedisCluster == null){
+                		sysLog.error("未传入jedisCluster对象");
+                		throw new CacheException(CacheConstants.EXCEPTION_INITIAL_PARAM, "未传入jedisCluster对象");                		
+                	}
+                	INSTANCE = new CacheStorageServiceRedisImpl(jedisCluster);
+                }
+            }
+        }
+        return INSTANCE;
+    }
 
 	
 	/**
@@ -38,10 +64,6 @@ public class CacheStorageServiceRedisImpl implements CacheStorageService{
      * @return
      */
     public Boolean setCache(String cacheKey, String cacheValue, int expireTimeSeconds){
-		if ( !useCache ){
-			return false;
-		}
-		
     	if(StringUtils.isEmpty(cacheKey)){
     		// 直接返回设置不成功，避免导致业务逻辑出错
     		svcLog.warn(Log4jUtil.getCallLocation() + " empty key ");
@@ -77,10 +99,6 @@ public class CacheStorageServiceRedisImpl implements CacheStorageService{
      * @return null if error occur
      */
     public String getCache(String cacheKey){
-    	if ( !useCache ){
-			return null;
-		}
-    	
     	try{
     		return jedisCluster.get(cacheKey);
     	} catch (Exception exp){ 
@@ -98,10 +116,6 @@ public class CacheStorageServiceRedisImpl implements CacheStorageService{
      * @return
      */
 	public Boolean isCacheKeyExists(String cacheKey) {
-		if ( !useCache ){
-			return false;
-		}
-		
 		try{
 			return jedisCluster.exists(cacheKey);
     	} catch (Exception exp){ 
@@ -119,10 +133,6 @@ public class CacheStorageServiceRedisImpl implements CacheStorageService{
      * @return
      */
 	public Boolean deleteCache(String cacheKey) {
-		if ( !useCache ){
-			return false;
-		}
-		
 		try{
 			if (isCacheKeyExists(cacheKey)) {
 				boolean delResult = jedisCluster.del(cacheKey) > 0;
@@ -146,10 +156,6 @@ public class CacheStorageServiceRedisImpl implements CacheStorageService{
      * @return 返回增长后的值, or 0 if error occur
      */
 	public Long incrCacheKey(String cacheKey, long incrStep, int expireTimeSeconds) {
-		if ( !useCache ){
-			return 0L;
-		}
-		
 		if(StringUtils.isEmpty(cacheKey)){
 			// 防止业务奔溃，直接返回失败值
     		svcLog.warn(Log4jUtil.getCallLocation() + " empty key ");
@@ -174,21 +180,13 @@ public class CacheStorageServiceRedisImpl implements CacheStorageService{
     	
 		return 0L; // 需要业务程序手动处理!!!
 	}
-
-
-	public JedisCluster getJedisCluster() {
-		return jedisCluster;
-	}
-
-	public void setJedisCluster(JedisCluster jedisCluster) {
+	
+	/***
+	 * 私有的构造参数，配合单例模式使用
+	 * 
+	 * @param jedisCluster
+	 */
+	private CacheStorageServiceRedisImpl(JedisCluster jedisCluster){
 		this.jedisCluster = jedisCluster;
-	}
-
-	public boolean isUseCache() {
-		return useCache;
-	}
-
-	public void setUseCache(boolean useCache) {
-		this.useCache = useCache;
 	}
 }

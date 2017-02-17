@@ -1,0 +1,57 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:util="http://www.springframework.org/schema/util" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context" 
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	http://www.springframework.org/schema/beans/spring-beans-2.5.xsd 
+	http://www.springframework.org/schema/util 
+	http://www.springframework.org/schema/util/spring-util-2.5.xsd 
+	http://www.springframework.org/schema/context 
+	http://www.springframework.org/schema/context/spring-context-2.5.xsd 
+	http://www.springframework.org/schema/tx 
+	http://www.springframework.org/schema/tx/spring-tx-2.5.xsd 
+	http://www.springframework.org/schema/aop 
+	http://www.springframework.org/schema/aop/spring-aop-2.5.xsd"
+	default-autowire="byName" default-lazy-init="false">
+
+	<context:annotation-config />
+	<context:component-scan base-package="org.zhuduan.cache.test" />
+	
+	<!-- 当proxy-target-class为false时使用JDK动态代理,为true使用cglib -->
+    <aop:aspectj-autoproxy proxy-target-class="true" />
+
+	<context:property-placeholder location="classpath*:*.properties" />	
+	
+	<!-- 2. jedisClusterCache, only for cache data -->
+	<bean id="jedisClusterCache" class="redis.clients.jedis.JedisCluster">
+		<constructor-arg index="0">
+			<set>
+				<bean class="redis.clients.jedis.HostAndPort">
+					<constructor-arg index="0" value="${dev.host1}" />
+					<constructor-arg index="1" value="${dev.port1}" />
+				</bean>
+				<bean class="redis.clients.jedis.HostAndPort">
+					<constructor-arg index="0" value="${dev.host2}" />
+					<constructor-arg index="1" value="${dev.port2}" />
+				</bean>
+				<bean class="redis.clients.jedis.HostAndPort">
+					<constructor-arg index="0" value="${dev.host3}" />
+					<constructor-arg index="1" value="${dev.port3}" />
+				</bean>
+			</set>
+		</constructor-arg>
+		<constructor-arg index="1" value="5000" />
+		<constructor-arg index="2" value="500" />
+		<constructor-arg index="3" ref="jedisPoolConfigCache" />
+	</bean>
+	<bean id="jedisPoolConfigCache" class="redis.clients.jedis.JedisPoolConfig" />
+	<!-- 2. jedisCluster end -->
+	
+	<!-- 用户配属缓存插件 -->
+	<bean id="simpleCacheAspect" class="org.zhuduan.cache.SimpleCacheAspect">
+		<constructor-arg index="0" ref="jedisClusterCache" ></constructor-arg>
+	</bean>
+	
+</beans>
