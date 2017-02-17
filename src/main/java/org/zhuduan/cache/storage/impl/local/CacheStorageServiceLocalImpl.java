@@ -1,11 +1,9 @@
 package org.zhuduan.cache.storage.impl.local;
 
-import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
-import org.aspectj.weaver.loadtime.ConcreteAspectCodeGen;
 import org.zhuduan.cache.storage.CacheStorageService;
 import org.zhuduan.cache.storage.impl.redis.CacheStorageServiceRedisImpl;
 import org.zhuduan.utils.CacheException;
