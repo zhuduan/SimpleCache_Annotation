@@ -18,6 +18,7 @@ import org.zhuduan.cache.SimpleCache;
 public class CacheMain {
 
 	public static void main(String[] args) {
+		@SuppressWarnings("resource")
 		AbstractApplicationContext cxt = new ClassPathXmlApplicationContext("applicationContext.xml");
 		CacheMain service = (CacheMain) cxt.getBean(CacheMain.class);  
 		
