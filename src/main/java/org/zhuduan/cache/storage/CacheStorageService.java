@@ -1,5 +1,7 @@
 package org.zhuduan.cache.storage;
 
+import org.zhuduan.utils.CacheException;
+
 /***
  * 
  * 缓存接口，定义了具体的缓存调用方法:
@@ -63,6 +65,7 @@ public interface CacheStorageService {
      * @param incrStep  以incrStep步长自增
      * @param expireTimeSeconds  过期时间, 单位秒!
      * @return 返回增长后的值
+     * @throws CacheException 
      */
-    Long incrCacheKey(String cacheKey, long incrStep, int expireTimeSeconds);
+    Long incrCacheKey(String cacheKey, long incrStep, int expireTimeSeconds) throws CacheException;
 }

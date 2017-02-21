@@ -41,47 +41,18 @@ public class SimpleCacheAspect {
 	
 	private static final Logger cacheLog = Log4jUtil.cacheLog;	
 	
-    private volatile static CacheStorageService cacheStorageService;			// 实际上用于缓存存储的实例类        
+    private static CacheStorageService cacheStorageService;			// 实际上用于缓存存储的实例类        
     
     
     /***
      * 采用默认实现方式的构造器
+     * 如果采用其它的storage实现，则会通过factory类来进行注入即可
+     * 该缓存实现主体类，不需要知道具体使用的缓存是哪一个
      * 
      */
     public SimpleCacheAspect(){
-    	// 用双重锁来防止线程不安全问题
-    	if ( cacheStorageService == null ) {                         
-            synchronized (SimpleCacheAspect.class) {
-                if ( cacheStorageService == null ) {       
-                	cacheStorageService = CacheStorageServiceLocalImpl.getInstance();
-                	cacheLog.info("成功创建CacheStorageServiceLocalImpl");
-                }
-            }
-        }
-    }
-    
-    
-    /***
-     * 采用Redis实现的构造器
-     * 
-     * @param jedisCluster
-     */
-    public SimpleCacheAspect(JedisCluster jedisCluster){
-    	// 用双重锁来防止线程不安全问题
-    	if ( cacheStorageService == null ) {                         
-            synchronized (SimpleCacheAspect.class) {
-                if ( cacheStorageService == null ) {       
-                	try{
-                		cacheStorageService = CacheStorageServiceRedisImpl.getInstance(jedisCluster);
-                		cacheLog.info("成功创建CacheStorageServiceRedisImpl");
-                	} catch(CacheException cacheException){
-                		// 如果初始化错误则使用默认的实现来实现缓存方法，防止出错导致奔溃
-            			cacheStorageService = CacheStorageServiceLocalImpl.getInstance();
-            			cacheLog.warn("由于"+cacheException.getErrMessage()+", 降级采用默认CacheStorageServiceLocalImpl");
-                	}
-                }
-            }
-        }
+    	// 默认采用local的非guava实现
+    	cacheStorageService = CacheStorageServiceLocalImpl.getInstance();    	
     }
     
 	
@@ -147,6 +118,18 @@ public class SimpleCacheAspect {
 		}
 		return dbExecuteValue;
 	}
+
+
+	// getter & setter
+	public static CacheStorageService getCacheStorageService() {
+		return cacheStorageService;
+	}
+
+
+	public static void setCacheStorageService(CacheStorageService cacheStorageService) {
+		SimpleCacheAspect.cacheStorageService = cacheStorageService;
+	}
+
 
 	/**
 	 * 用类名、方法名、参数值作为缓存的key
