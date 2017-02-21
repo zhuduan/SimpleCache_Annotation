@@ -51,7 +51,7 @@
 	
 	<!-- 用户配属缓存插件 -->
 	<bean id="simpleCacheAspect" class="org.zhuduan.cache.SimpleCacheAspect">
-		<constructor-arg index="0" ref="jedisClusterCache" ></constructor-arg>
+		<!-- <constructor-arg index="0" ref="jedisClusterCache" ></constructor-arg>-->
 	</bean>
 	
 </beans>

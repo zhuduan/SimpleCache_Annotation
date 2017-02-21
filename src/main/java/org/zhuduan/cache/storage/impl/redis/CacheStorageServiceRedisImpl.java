@@ -13,6 +13,7 @@ import redis.clients.jedis.JedisCluster;
 /***
  * 
  * CacheStorageService的redis实现
+ * 采用Redis的特性来实现相关的缓存机制
  * 
  * 
  * @author	zhuhaifeng

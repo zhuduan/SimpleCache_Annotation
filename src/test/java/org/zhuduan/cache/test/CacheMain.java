@@ -22,7 +22,7 @@ public class CacheMain {
 		CacheMain service = (CacheMain) cxt.getBean(CacheMain.class);  
 		
 		System.out.println("start!");
-		for(int i=0;i<3;i++){
+		for(int i=0;i<5;i++){
 			System.out.println(i+": "+service.testCache());
 		}
 	}
