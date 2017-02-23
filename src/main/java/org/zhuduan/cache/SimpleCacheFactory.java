@@ -1,6 +1,12 @@
 package org.zhuduan.cache;
 
 import org.apache.log4j.Logger;
+import org.zhuduan.cache.storage.CacheStorageService;
+import org.zhuduan.cache.storage.impl.guava.CacheStorageServiceExpireGuavaImpl;
+import org.zhuduan.cache.storage.impl.guava.CacheStorageServiceOriginGuavaImpl;
+import org.zhuduan.cache.storage.impl.local.CacheStorageServiceLocalImpl;
+import org.zhuduan.cache.storage.impl.redis.CacheStorageServiceRedisImpl;
+import org.zhuduan.utils.CacheException;
 import org.zhuduan.utils.Log4jUtil;
 
 import redis.clients.jedis.JedisCluster;
@@ -8,10 +14,10 @@ import redis.clients.jedis.JedisCluster;
 public class SimpleCacheFactory {
 	
 	private static final Logger 			cacheLog 	= 	Log4jUtil.cacheLog;	
-	private static final Logger 			svcLog 		= 	Log4jUtil.svcLog;	
-	private static final Logger 			sysLog 		= 	Log4jUtil.sysLog;	
 	
-	// inner object，用于承载实际实现缓存的类（但是factory中需要根据配置来选择使用存储结构）
+	// TODO:inner object，直接采用静态类的方式加载起来（会造成一定的内存浪费，之后可以通过静态内部类之类的改进）
+	// but 用于承载实际实现缓存的类（但是factory中需要根据配置来选择使用存储结构）
+	@SuppressWarnings("unused")
 	private static final SimpleCacheAspect	cacheAspect	=	new SimpleCacheAspect();		
 	
 
@@ -19,7 +25,7 @@ public class SimpleCacheFactory {
 	
 	private boolean 		useGuava		=	false;		// 本地缓存是否使用guava
 	
-	private boolean 		useGuavaOrigin	=	true;		// 是否直接使用原生的guava（key和value都是weakReference，但是不知道差异化的expiretime）
+	private boolean 		useGuavaOrigin	=	false;		// 是否直接使用原生的guava（key和value都是weakReference，但是不支持差异化的expiretime）
 	
 	private JedisCluster	jedisCluster	=	null;		// 可以使用的JedisCluster（如果没有则会选择其他方式）
 	
@@ -31,10 +37,55 @@ public class SimpleCacheFactory {
 	 * 
 	 */
 	public SimpleCacheFactory(){
-		//TODO: 根据不同的参数进行cacheAspect中的storage装配
-		//		重复调用该构造参数，可能造成storage实现更换导致的部分缓存数据丢失（不过在该场景下问题不大）
+		// 根据不同的参数进行cacheAspect中的storage装配 --- 采用策略模式
+		// 		重复调用该构造参数，可能造成storage实现更换导致的部分缓存数据丢失
+		// 		（不过在该场景下问题不大，一般只会在spring注入时一起完成构造）
 		synchronized (SimpleCacheFactory.class) {
+			CacheStorageService cacheStorageService = null;			
+			// 如果采用本地缓存方案
+			if ( true == useLocalCache ){
+				if ( true == useGuava ){
+					// 使用原生Guava方案
+					if ( true == useGuavaOrigin ){
+						//TODO: 做一个带有重载参数的
+						cacheStorageService = CacheStorageServiceOriginGuavaImpl.getInstance();
+						cacheLog.info("采用了原生的GuavaCache方案");
+					}
+					
+					// 使用可以支持不同Expire策略的Guava方案
+					cacheStorageService = CacheStorageServiceExpireGuavaImpl.getInstance();
+					cacheLog.info("采用了定义expireTime的GuavaCache方案");
+				}
+				
+				// 使用默认的本地缓存方案
+				cacheStorageService = CacheStorageServiceLocalImpl.getInstance();
+				cacheLog.info("采用了默认的LocalImpl方案");
+			}
 			
+			// 不采用本地方案，则顺序去遍历各种客户端：
+			//		Redis > Memcache(未实现) > others(未实现) > default
+			// Redis的装配
+			if ( jedisCluster != null ){
+				try {
+					cacheStorageService = CacheStorageServiceRedisImpl.getInstance(jedisCluster);
+				} catch (CacheException e) {
+					cacheStorageService = CacheStorageServiceLocalImpl.getInstance();
+					cacheLog.error("捕获到jedisCluster为空，退化为默认的LocalImpl方案");
+				}
+			}
+			
+			// TODO: MemCache的装配
+			//		 暂未实现
+			
+			// 最后做重复检查，如果都没有匹配到，则采用默认的本地实现
+			if ( null == cacheStorageService){
+				cacheStorageService = CacheStorageServiceLocalImpl.getInstance();
+				cacheLog.info("采用了默认的LocalImpl方案");
+			}
+			
+			// 将cacheStorageService注入到实际使用的SimpleCacheAspect类中去
+			SimpleCacheAspect.setCacheStorageService(cacheStorageService);
+			cacheLog.info("完成对SimpleCacheAspect中CacheStorageService的注入~");
 		}
 	}
 
