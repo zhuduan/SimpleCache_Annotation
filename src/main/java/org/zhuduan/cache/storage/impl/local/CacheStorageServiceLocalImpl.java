@@ -163,8 +163,11 @@ public class CacheStorageServiceLocalImpl implements CacheStorageService {
      */
 	@Override
 	public Boolean isCacheKeyExists(String cacheKey) {
-		// TODO Auto-generated method stub
-		return null;
+		if(Strings.isNullOrEmpty(cacheKey)){
+			svcLog.warn(Log4jUtil.getCallLocation() + " empty key ");
+			return false;
+		}
+		return cacheMap.containsKey(cacheKey);
 	}
 
 
@@ -176,8 +179,12 @@ public class CacheStorageServiceLocalImpl implements CacheStorageService {
      */
 	@Override
 	public Boolean deleteCache(String cacheKey) {
-		// TODO Auto-generated method stub
-		return null;
+		if(Strings.isNullOrEmpty(cacheKey)){
+			svcLog.warn(Log4jUtil.getCallLocation() + " empty key ");
+			return false;
+		}
+		cacheMap.remove(cacheKey);
+		return true;
 	}
 
 	
