@@ -15,6 +15,19 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 
+
+/***
+ * 
+ * 使用原生的GuavaCache来缓存信息，只是在这个基础上进行了简单的使用包装
+ * 考虑到GuavaCache的一些特性，采用如下配置：
+ * 		1.采用WeakReference
+ * 		2.Access和Write过期时间在SimpleCacheConfig中进行统一配置
+ * 
+ * 
+ * @author	zhuhaifeng
+ * @date	2017年2月23日
+ *
+ */
 public class CacheStorageServiceOriginGuavaImpl implements CacheStorageService {
 	
 	private static final Logger		sysLog		=	Log4jUtil.sysLog;		// 系统日志
@@ -103,6 +116,7 @@ public class CacheStorageServiceOriginGuavaImpl implements CacheStorageService {
 							        .build(new CacheLoader<String, String>(){
 									            @Override
 									            public String load(String key) throws Exception {
+									            	// TODO: 怎么处理load事件
 									                return key;
 									            }							            
 							        });  

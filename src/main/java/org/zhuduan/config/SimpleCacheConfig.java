@@ -10,4 +10,7 @@ public class SimpleCacheConfig {
 	public static final long 	ORIGIN_GUAVACACHE_ACCESS_EXPIRE_SECONDS	=	3600L;				// 缓存的Access过期时间，默认 3600s
 	public static final long 	ORIGIN_GUAVACACHE_WRITE_EXPIRE_SECONDS	=	3600L;				// 缓存的Write过期时间，默认 3600s
 	
+	
+	public static final long 	EXPIRE_GUAVACACHE_OBJECT_NUM_MAX		=	1000000000L;		// 可以缓存的最大个数，默认 1亿个
+	
 }

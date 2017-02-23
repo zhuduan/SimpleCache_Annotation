@@ -149,7 +149,7 @@ public class CacheStorageServiceLocalImpl implements CacheStorageService {
 			return true;
     	} catch (Exception exp){ 
     		// 防止缓存崩溃,影响主业务逻辑
-    		sysLog.error(Log4jUtil.getCallLocation() + " redis error for: " + exp.getMessage());
+    		sysLog.error(Log4jUtil.getCallLocation() + " local impl error for: " + exp.getMessage());
     	}
     	return false;
 	}
