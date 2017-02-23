@@ -12,12 +12,8 @@ import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.stereotype.Component;
 import org.zhuduan.cache.storage.CacheStorageService;
 import org.zhuduan.cache.storage.impl.local.CacheStorageServiceLocalImpl;
-import org.zhuduan.cache.storage.impl.redis.CacheStorageServiceRedisImpl;
-import org.zhuduan.utils.CacheException;
 import org.zhuduan.utils.Log4jUtil;
 import org.zhuduan.utils.SerializeUtils;
-
-import redis.clients.jedis.JedisCluster;
 
 
 /***

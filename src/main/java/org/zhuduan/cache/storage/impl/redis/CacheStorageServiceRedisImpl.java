@@ -40,7 +40,8 @@ public class CacheStorageServiceRedisImpl implements CacheStorageService{
 	 * @throws CacheException
 	 */
     public static CacheStorageServiceRedisImpl getInstance(JedisCluster jedisCluster) throws CacheException {
-        // 二重锁检验，来防止多线程导致的线程安全问题
+        // TODO: 因为happens-before原则的问题，可能导致二重锁隐患（但考虑到这种场景十分有限而且这时发生在初始化的阶段，是否有必要调整）
+    	// 二重锁检验，来防止多线程导致的线程安全问题
     	if (INSTANCE == null) {                         
             synchronized (CacheStorageServiceRedisImpl.class) {
                 if (INSTANCE == null) {       
