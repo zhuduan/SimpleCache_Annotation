@@ -6,6 +6,7 @@ import java.util.concurrent.TimeUnit;
 import org.apache.log4j.Logger;
 import org.zhuduan.cache.storage.CacheStorageService;
 import org.zhuduan.cache.storage.impl.redis.CacheStorageServiceRedisImpl;
+import org.zhuduan.config.SimpleCacheConfig;
 import org.zhuduan.utils.CacheConstants;
 import org.zhuduan.utils.CacheException;
 import org.zhuduan.utils.Log4jUtil;
@@ -19,10 +20,6 @@ public class CacheStorageServiceOriginGuavaImpl implements CacheStorageService {
 	private static final Logger		sysLog		=	Log4jUtil.sysLog;		// 系统日志
 	private static final Logger		svcLog		=	Log4jUtil.svcLog;		// service日志
 
-	private static final long CACHE_OBJECT_NUM_MAX			=	1000000000L;		// 可以缓存的最大个数，默认 1亿个
-	private static final long CACHE_ACCESS_EXPIRE_SECONDS	=	600L;				// 缓存的Access过期时间，默认 600s
-	private static final long CACHE_WRITE_EXPIRE_SECONDS	=	600L;				// 缓存的Write过期时间，默认 600s
-	
 	private volatile LoadingCache<String,String> cahceBuilder;						// 内部使用的Guava缓存
 	
 	private volatile static CacheStorageServiceOriginGuavaImpl INSTANCE; 			// 单例模式，声明成 volatile 的实例	
@@ -39,9 +36,9 @@ public class CacheStorageServiceOriginGuavaImpl implements CacheStorageService {
     	if (INSTANCE == null) {                         
             synchronized (CacheStorageServiceRedisImpl.class) {
                 if (INSTANCE == null) {
-                	INSTANCE = new CacheStorageServiceOriginGuavaImpl(CACHE_OBJECT_NUM_MAX,
-                													CACHE_ACCESS_EXPIRE_SECONDS,
-                													CACHE_WRITE_EXPIRE_SECONDS);
+                	INSTANCE = new CacheStorageServiceOriginGuavaImpl(SimpleCacheConfig.ORIGIN_GUAVACACHE_OBJECT_NUM_MAX,
+										                			SimpleCacheConfig.ORIGIN_GUAVACACHE_ACCESS_EXPIRE_SECONDS,
+										                			SimpleCacheConfig.ORIGIN_GUAVACACHE_WRITE_EXPIRE_SECONDS);
                 }
             }
         }
@@ -61,15 +58,15 @@ public class CacheStorageServiceOriginGuavaImpl implements CacheStorageService {
     	// 检验所有的入参
     	if (null==objectNumMax || objectNumMax.longValue()<=0L){
     		svcLog.warn("origin guava中objectNumMax传入值有错误,使用了默认值");
-			objectNumMax = CACHE_OBJECT_NUM_MAX;
+			objectNumMax = SimpleCacheConfig.ORIGIN_GUAVACACHE_OBJECT_NUM_MAX;
 		}
 		if (null==accessExpireSeconds || accessExpireSeconds.longValue()<=0L){
 			svcLog.warn("origin guava中accessExpireSeconds传入值有错误,使用了默认值");
-			accessExpireSeconds = CACHE_ACCESS_EXPIRE_SECONDS;
+			accessExpireSeconds = SimpleCacheConfig.ORIGIN_GUAVACACHE_ACCESS_EXPIRE_SECONDS;
 		}
 		if (null==writeExpireSeconds || writeExpireSeconds.longValue()<=0L){
 			svcLog.warn("origin guava中writeExpireSeconds传入值有错误,使用了默认值");
-			writeExpireSeconds = CACHE_WRITE_EXPIRE_SECONDS;
+			writeExpireSeconds = SimpleCacheConfig.ORIGIN_GUAVACACHE_WRITE_EXPIRE_SECONDS;
 		}
     	
         // 二重锁检验，来防止多线程导致的线程安全问题
@@ -98,9 +95,9 @@ public class CacheStorageServiceOriginGuavaImpl implements CacheStorageService {
 	 */
 	private CacheStorageServiceOriginGuavaImpl(Long objectNumMax, Long accessExpireSeconds, Long writeExpireSeconds){				
 		this.cahceBuilder =CacheBuilder.newBuilder()
-									.maximumSize(CACHE_OBJECT_NUM_MAX)
-									.expireAfterAccess(CACHE_ACCESS_EXPIRE_SECONDS, TimeUnit.SECONDS)
-									.expireAfterWrite(CACHE_WRITE_EXPIRE_SECONDS, TimeUnit.SECONDS)
+									.maximumSize(SimpleCacheConfig.ORIGIN_GUAVACACHE_OBJECT_NUM_MAX)
+									.expireAfterAccess(SimpleCacheConfig.ORIGIN_GUAVACACHE_ACCESS_EXPIRE_SECONDS, TimeUnit.SECONDS)
+									.expireAfterWrite(SimpleCacheConfig.ORIGIN_GUAVACACHE_WRITE_EXPIRE_SECONDS, TimeUnit.SECONDS)
 									.weakKeys()
 									.weakValues()
 							        .build(new CacheLoader<String, String>(){

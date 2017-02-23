@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
+import org.zhuduan.config.SimpleCacheConfig;
 import org.zhuduan.model.CacheInfoModel;
 import org.zhuduan.utils.Log4jUtil;
 
@@ -26,10 +27,6 @@ public class CacheStorageServiceLocalGuardThread extends Thread {
 	private static final Logger		sysLog		=	Log4jUtil.sysLog;		// 系统日志
 	private static final Logger		svcLog		=	Log4jUtil.svcLog;		// service日志	
 	
-	private static final int 	SLEEP_SECONDS		=	3600;			// 周期性执行线程（不用太过频繁，因为这里主要是清理一些长期不同的对象）
-	@SuppressWarnings("unused")
-	private static final long	OBJ_CLEAN_THREDHOLD	=	10000000;		// 需要开始清理的阈值（小于该阈值则不用开始清理： 可选）	
-
 	private boolean isClean = true;			// 用于标识守护线程是否周期性对Map进行清理
 	
 	private ConcurrentHashMap<String, SoftReference<CacheInfoModel>> cacheMap = null;		// 指向localImpl中的Map
@@ -51,7 +48,7 @@ public class CacheStorageServiceLocalGuardThread extends Thread {
 			try {
 				// 作出清理的动作
 				svcLog.info("this time clean obj num : " +removeExpireObj());
-				Thread.sleep(SLEEP_SECONDS * 1000L);
+				Thread.sleep(SimpleCacheConfig.GUARD_THREAD_SLEEP_SECONDS * 1000L);
 			} catch (Exception exception) {
 				// 如果出错，则需要catch到错误，避免影响主流程
 				sysLog.error(Log4jUtil.getCallLocation() + " run method fail for : " + exception.getMessage());
