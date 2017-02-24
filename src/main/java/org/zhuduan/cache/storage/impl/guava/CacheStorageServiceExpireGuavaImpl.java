@@ -1,6 +1,5 @@
 package org.zhuduan.cache.storage.impl.guava;
 
-import java.util.concurrent.ExecutionException;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
@@ -12,9 +11,8 @@ import org.zhuduan.utils.CacheException;
 import org.zhuduan.utils.Log4jUtil;
 
 import com.google.common.base.Strings;
+import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
 
 /***
  * 
@@ -34,9 +32,9 @@ public class CacheStorageServiceExpireGuavaImpl implements CacheStorageService {
 	private static final Logger		sysLog		=	Log4jUtil.sysLog;		// 系统日志
 	private static final Logger		svcLog		=	Log4jUtil.svcLog;		// service日志
 
-	private volatile LoadingCache<String,CacheInfoModel> cahceBuilder;				// 内部使用的Guava缓存
+	private volatile Cache<String,CacheInfoModel> guavaCache;				// 内部使用的Guava缓存
 	
-	private volatile static CacheStorageServiceExpireGuavaImpl INSTANCE; 			// 单例模式，声明成 volatile 的实例	
+	private volatile static CacheStorageServiceExpireGuavaImpl INSTANCE; 	// 单例模式，声明成 volatile 的实例	
 	
 	
 	/***
@@ -63,32 +61,24 @@ public class CacheStorageServiceExpireGuavaImpl implements CacheStorageService {
 		if(Strings.isNullOrEmpty(cacheKey)){
 			svcLog.warn(Log4jUtil.getCallLocation() + " empty key ");
 			return null;
+		}		
+		CacheInfoModel infoModel = guavaCache.getIfPresent(cacheKey);		
+		// key本身不存在
+		if ( infoModel==null ){
+			return null;
 		}
 		
-		try {
-			CacheInfoModel infoModel = cahceBuilder.get(cacheKey);
-			
-			// key本身不存在
-			if ( infoModel==null ){
-				return null;
-			}
-			
-			// 如果信息不存在或者已经过期
-			if ( infoModel.getCacheValue()==null
-					|| infoModel.getCacheBeginTimeLong()==null
-					|| infoModel.getCacheExpireTimeLong()==null 
-					|| ((System.currentTimeMillis() - infoModel.getCacheBeginTimeLong())>infoModel.getCacheExpireTimeLong()))
-			{
-				cahceBuilder.invalidate(cacheKey);
-				svcLog.info("clean obj in expire guava for key : " + cacheKey);
-				return null;
-			}
-			return infoModel.getCacheValue();
-		} catch (ExecutionException exp) {
-			// 防止缓存崩溃,影响主业务逻辑
-    		sysLog.error(Log4jUtil.getCallLocation() + " expire guava error for: " + exp.getMessage());
-    		return null;
-		}	
+		// 如果信息不存在或者已经过期
+		if ( infoModel.getCacheValue()==null
+				|| infoModel.getCacheBeginTimeLong()==null
+				|| infoModel.getCacheExpireTimeLong()==null 
+				|| ((System.currentTimeMillis() - infoModel.getCacheBeginTimeLong())>infoModel.getCacheExpireTimeLong()))
+		{
+			guavaCache.invalidate(cacheKey);
+			svcLog.info("clean obj in expire guava for key : " + cacheKey);
+			return null;
+		}
+		return infoModel.getCacheValue();
 	}
 
 	
@@ -118,7 +108,7 @@ public class CacheStorageServiceExpireGuavaImpl implements CacheStorageService {
     		cacheInfoModel.setCacheExpireTimeLong((expireTimeSeconds*1000L));
     		cacheInfoModel.setCacheBeginTimeLong(System.currentTimeMillis());
     		
-    		cahceBuilder.put(cacheKey, cacheInfoModel);
+    		guavaCache.put(cacheKey, cacheInfoModel);
     		return true;
     	} catch (Exception exp){ 
     		// 防止缓存崩溃,影响主业务逻辑
@@ -130,7 +120,7 @@ public class CacheStorageServiceExpireGuavaImpl implements CacheStorageService {
 	
 	@Override
 	public Boolean isCacheKeyExists(String cacheKey) {
-		CacheInfoModel infoModel = cahceBuilder.getIfPresent(cacheKey);
+		CacheInfoModel infoModel = guavaCache.getIfPresent(cacheKey);
 		if (null == infoModel || null == infoModel.getCacheValue()){
 			return false;
 		}
@@ -140,7 +130,7 @@ public class CacheStorageServiceExpireGuavaImpl implements CacheStorageService {
 	
 	@Override
 	public Boolean deleteCache(String cacheKey) {
-		cahceBuilder.invalidate(cacheKey);
+		guavaCache.invalidate(cacheKey);
 		return true;
 	}
 
@@ -153,16 +143,10 @@ public class CacheStorageServiceExpireGuavaImpl implements CacheStorageService {
 	
 	// 私有的构造器
 	public CacheStorageServiceExpireGuavaImpl(){
-		this.cahceBuilder =CacheBuilder.newBuilder()
+		this.guavaCache =CacheBuilder.newBuilder()
 				.maximumSize(SimpleCacheConfig.EXPIRE_GUAVACACHE_OBJECT_NUM_MAX)
 				.weakKeys()
 				.weakValues()
-		        .build(new CacheLoader<String, CacheInfoModel>(){
-				            @Override
-				            public CacheInfoModel load(String key) throws Exception {
-				            	// TODO: 怎么处理load事件
-				            	return null;
-				            }							            
-		        });  
+		        .build();  
 	}
 }

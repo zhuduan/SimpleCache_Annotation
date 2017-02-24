@@ -1,6 +1,5 @@
 package org.zhuduan.cache.storage.impl.guava;
 
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
@@ -11,9 +10,8 @@ import org.zhuduan.utils.CacheConstants;
 import org.zhuduan.utils.CacheException;
 import org.zhuduan.utils.Log4jUtil;
 
+import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
 
 
 /***
@@ -30,10 +28,9 @@ import com.google.common.cache.LoadingCache;
  */
 public class CacheStorageServiceOriginGuavaImpl implements CacheStorageService {
 	
-	private static final Logger		sysLog		=	Log4jUtil.sysLog;		// 系统日志
 	private static final Logger		svcLog		=	Log4jUtil.svcLog;		// service日志
 
-	private volatile LoadingCache<String,String> cahceBuilder;						// 内部使用的Guava缓存
+	private volatile Cache<String,String> guavaCahce;						// 内部使用的Guava缓存
 	
 	private volatile static CacheStorageServiceOriginGuavaImpl INSTANCE; 			// 单例模式，声明成 volatile 的实例	
 	
@@ -107,44 +104,32 @@ public class CacheStorageServiceOriginGuavaImpl implements CacheStorageService {
 	 * @param writeExpireSeconds
 	 */
 	private CacheStorageServiceOriginGuavaImpl(Long objectNumMax, Long accessExpireSeconds, Long writeExpireSeconds){				
-		this.cahceBuilder =CacheBuilder.newBuilder()
+		this.guavaCahce =CacheBuilder.newBuilder()
 									.maximumSize(SimpleCacheConfig.ORIGIN_GUAVACACHE_OBJECT_NUM_MAX)
 									.expireAfterAccess(SimpleCacheConfig.ORIGIN_GUAVACACHE_ACCESS_EXPIRE_SECONDS, TimeUnit.SECONDS)
 									.expireAfterWrite(SimpleCacheConfig.ORIGIN_GUAVACACHE_WRITE_EXPIRE_SECONDS, TimeUnit.SECONDS)
 									.weakKeys()
 									.weakValues()
-							        .build(new CacheLoader<String, String>(){
-									            @Override
-									            public String load(String key) throws Exception {
-									            	// TODO: 怎么处理load事件
-									                return key;
-									            }							            
-							        });  
+							        .build();  
 	}
 	
 	
 	@Override
 	public String getCache(String cacheKey) {
-		try {
-			return cahceBuilder.get(cacheKey);
-		} catch (ExecutionException exp) {
-			// 防止缓存崩溃,影响主业务逻辑
-    		sysLog.error(Log4jUtil.getCallLocation() + " origin guava error for: " + exp.getMessage());
-    		return null;
-		}		
+		return guavaCahce.getIfPresent(cacheKey);		
 	}
 
 	
 	@Override
 	public Boolean setCache(String cacheKey, String cacheValue, int expireTimeSeconds) {
 		// 这里的expireTimeSeconds实际上是不生效的
-		cahceBuilder.put(cacheKey, cacheValue);
+		guavaCahce.put(cacheKey, cacheValue);
 		return true;
 	}
 
 	@Override
 	public Boolean isCacheKeyExists(String cacheKey) {
-		String cacheValue = cahceBuilder.getIfPresent(cacheKey);
+		String cacheValue = guavaCahce.getIfPresent(cacheKey);
 		if (null == cacheValue){
 			return false;
 		}
@@ -154,7 +139,7 @@ public class CacheStorageServiceOriginGuavaImpl implements CacheStorageService {
 	
 	@Override
 	public Boolean deleteCache(String cacheKey) {
-		cahceBuilder.invalidate(cacheKey);
+		guavaCahce.invalidate(cacheKey);
 		return true;
 	}
 
