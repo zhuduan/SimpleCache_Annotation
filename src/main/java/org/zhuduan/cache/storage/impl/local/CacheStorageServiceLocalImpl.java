@@ -6,7 +6,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.zhuduan.cache.storage.CacheStorageService;
-import org.zhuduan.cache.storage.impl.redis.CacheStorageServiceRedisImpl;
 import org.zhuduan.model.CacheInfoModel;
 import org.zhuduan.utils.CacheConstants;
 import org.zhuduan.utils.CacheException;
@@ -58,7 +57,7 @@ public class CacheStorageServiceLocalImpl implements CacheStorageService {
     public static CacheStorageServiceLocalImpl getInstance() {
         // 二重锁检验，来防止多线程导致的线程安全问题
     	if (INSTANCE == null) {                         
-            synchronized (CacheStorageServiceRedisImpl.class) {
+            synchronized (CacheStorageServiceLocalImpl.class) {
                 if (INSTANCE == null) {
                 	INSTANCE = new CacheStorageServiceLocalImpl();
                 }

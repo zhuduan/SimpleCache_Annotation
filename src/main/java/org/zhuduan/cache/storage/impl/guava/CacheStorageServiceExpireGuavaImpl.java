@@ -115,7 +115,7 @@ public class CacheStorageServiceExpireGuavaImpl implements CacheStorageService {
     		// 将缓存信息封装起来
     		CacheInfoModel cacheInfoModel = new CacheInfoModel();
     		cacheInfoModel.setCacheValue(cacheValue);
-    		cacheInfoModel.setCacheExpireTimeLong(expireTimeSeconds*1000L);
+    		cacheInfoModel.setCacheExpireTimeLong((expireTimeSeconds*1000L));
     		cacheInfoModel.setCacheBeginTimeLong(System.currentTimeMillis());
     		
     		cahceBuilder.put(cacheKey, cacheInfoModel);
@@ -161,7 +161,7 @@ public class CacheStorageServiceExpireGuavaImpl implements CacheStorageService {
 				            @Override
 				            public CacheInfoModel load(String key) throws Exception {
 				            	// TODO: 怎么处理load事件
-				            	return (new CacheInfoModel());
+				            	return null;
 				            }							            
 		        });  
 	}

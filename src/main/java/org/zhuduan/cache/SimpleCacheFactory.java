@@ -11,6 +11,15 @@ import org.zhuduan.utils.Log4jUtil;
 
 import redis.clients.jedis.JedisCluster;
 
+
+/***
+ * 
+ * 
+ * 
+ * @author	zhuhaifeng
+ * @date	2017年2月24日
+ *
+ */
 public class SimpleCacheFactory {
 	
 	private static final Logger 			cacheLog 	= 	Log4jUtil.cacheLog;	
@@ -21,13 +30,13 @@ public class SimpleCacheFactory {
 	private static final SimpleCacheAspect	cacheAspect	=	new SimpleCacheAspect();		
 	
 
-	private boolean 		useLocalCache	=	false;		// 使用的是否是本地缓存？（推荐有限使用在线缓存如Redis等）
+	private volatile boolean 		useLocalCache	=	false;		// 使用的是否是本地缓存？（推荐有限使用在线缓存如Redis等）
 	
-	private boolean 		useGuava		=	false;		// 本地缓存是否使用guava
+	private volatile boolean 		useGuava		=	false;		// 本地缓存是否使用guava
 	
-	private boolean 		useGuavaOrigin	=	false;		// 是否直接使用原生的guava（key和value都是weakReference，但是不支持差异化的expiretime）
+	private volatile boolean 		useGuavaOrigin	=	false;		// 是否直接使用原生的guava（key和value都是weakReference，但是不支持差异化的expiretime）
 	
-	private JedisCluster	jedisCluster	=	null;		// 可以使用的JedisCluster（如果没有则会选择其他方式）
+	private volatile JedisCluster	jedisCluster	=	null;		// 可以使用的JedisCluster（如果没有则会选择其他方式）
 	
 	
 	/***
@@ -36,7 +45,46 @@ public class SimpleCacheFactory {
 	 * 				（当然，由于Spring的默认IOC模式为单例模型，因此这里并不冲突）
 	 * 
 	 */
-	public SimpleCacheFactory(){
+	public SimpleCacheFactory(Boolean useLocalCache, Boolean useGuava, Boolean useGuavaOrigin, JedisCluster jedisclustr){
+		// 从配置文件中读入配置参数
+		this.useLocalCache = useLocalCache;
+		this.useGuava = useGuava;
+		this.useGuavaOrigin = useGuavaOrigin;
+		this.jedisCluster = jedisclustr;
+		
+		// 进行初始化
+		initial();
+	}	
+	
+	
+	public SimpleCacheFactory(Boolean useLocalCache, Boolean useGuava, Boolean useGuavaOrigin){
+		// 从配置文件中读入配置参数
+		this.useLocalCache = useLocalCache;
+		this.useGuava = useGuava;
+		this.useGuavaOrigin = useGuavaOrigin;
+		
+		// 进行初始化
+		initial();
+	}
+	
+	
+	public SimpleCacheFactory(JedisCluster jedisclustr){
+		// 从配置文件中读入配置参数
+		this.jedisCluster = jedisclustr;
+		
+		// 进行初始化
+		initial();
+	}
+	
+	
+	public SimpleCacheFactory(){		
+		// 进行初始化
+		initial();
+	}
+	
+	
+	// 完成对参数的初始化
+	private void initial(){
 		// 根据不同的参数进行cacheAspect中的storage装配 --- 采用策略模式
 		// 		重复调用该构造参数，可能造成storage实现更换导致的部分缓存数据丢失
 		// 		（不过在该场景下问题不大，一般只会在spring注入时一起完成构造）
@@ -55,27 +103,29 @@ public class SimpleCacheFactory {
 					// 使用可以支持不同Expire策略的Guava方案
 					cacheStorageService = CacheStorageServiceExpireGuavaImpl.getInstance();
 					cacheLog.info("采用了定义expireTime的GuavaCache方案");
+				} else {				
+					// 使用默认的本地缓存方案
+					cacheStorageService = CacheStorageServiceLocalImpl.getInstance();
+					cacheLog.info("不使用Guava，采用了默认的LocalImpl方案");
 				}
-				
-				// 使用默认的本地缓存方案
-				cacheStorageService = CacheStorageServiceLocalImpl.getInstance();
-				cacheLog.info("不使用Guava，采用了默认的LocalImpl方案");
 			}
 			
 			// 不采用本地方案，则顺序去遍历各种客户端：
 			//		Redis > Memcache(未实现) > others(未实现) > default
 			// Redis的装配
-			if ( jedisCluster != null ){
-				try {
-					cacheStorageService = CacheStorageServiceRedisImpl.getInstance(jedisCluster);
-				} catch (CacheException e) {
-					cacheStorageService = CacheStorageServiceLocalImpl.getInstance();
-					cacheLog.error("捕获到jedisCluster为空，退化为默认的LocalImpl方案");
+			else{
+				if ( jedisCluster != null ){			
+					try {
+						cacheStorageService = CacheStorageServiceRedisImpl.getInstance(jedisCluster);
+					} catch (CacheException e) {
+						cacheStorageService = CacheStorageServiceLocalImpl.getInstance();
+						cacheLog.error("捕获到jedisCluster为空，退化为默认的LocalImpl方案");
+					}
 				}
-			}
 			
-			// TODO: MemCache的装配
-			//		 暂未实现
+				// TODO: MemCache的装配
+				//		 暂未实现
+			}
 			
 			// 最后做重复检查，如果都没有匹配到，则采用默认的本地实现
 			if ( null == cacheStorageService){
@@ -88,7 +138,6 @@ public class SimpleCacheFactory {
 			cacheLog.info("完成对SimpleCacheAspect中CacheStorageService的注入~");
 		}
 	}
-
 	
 	
 	//getter & setter

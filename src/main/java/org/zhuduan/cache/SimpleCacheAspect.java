@@ -11,7 +11,6 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.stereotype.Component;
 import org.zhuduan.cache.storage.CacheStorageService;
-import org.zhuduan.cache.storage.impl.local.CacheStorageServiceLocalImpl;
 import org.zhuduan.utils.Log4jUtil;
 import org.zhuduan.utils.SerializeUtils;
 
@@ -42,8 +41,7 @@ public class SimpleCacheAspect {
      * 
      */
     public SimpleCacheAspect(){
-    	// 默认采用local的非guava实现
-    	cacheStorageService = CacheStorageServiceLocalImpl.getInstance();    	
+    	
     }
     
 	

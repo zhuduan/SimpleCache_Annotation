@@ -51,10 +51,10 @@
 	
 	<!-- 用户配属缓存插件 -->
 	<bean id="SimpleCacheFactory" class="org.zhuduan.cache.SimpleCacheFactory">
-		<property name="useLocalCache" value="false"></property>
-		<property name="useGuava" value="true"></property>
-		<property name="useGuavaOrigin" value="true"></property>
-		<property name="jedisCluster" ref="jedisClusterCache"></property>
+		<constructor-arg index="0" value="true"></constructor-arg><!-- useLocalCache  -->
+		<constructor-arg index="1" value="true"></constructor-arg><!-- useGuava  -->
+		<constructor-arg index="2" value="false"></constructor-arg><!-- useGuavaOrigin  -->
+		<constructor-arg index="3" ref="jedisClusterCache"></constructor-arg><!-- jedisCluster  -->		
 	</bean>
 	
 </beans>
