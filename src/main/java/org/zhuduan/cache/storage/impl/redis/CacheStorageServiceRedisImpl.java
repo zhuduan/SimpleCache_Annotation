@@ -2,7 +2,6 @@ package org.zhuduan.cache.storage.impl.redis;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
-import org.springframework.stereotype.Service;
 import org.zhuduan.cache.storage.CacheStorageService;
 import org.zhuduan.utils.CacheConstants;
 import org.zhuduan.utils.CacheException;
@@ -20,7 +19,6 @@ import redis.clients.jedis.JedisCluster;
  * @date	2017年2月16日
  *
  */
-@Service
 public class CacheStorageServiceRedisImpl implements CacheStorageService{
 	
 	private static final Logger		sysLog		=	Log4jUtil.sysLog;		// 系统日志

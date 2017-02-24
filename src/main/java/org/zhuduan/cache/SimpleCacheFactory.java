@@ -59,7 +59,7 @@ public class SimpleCacheFactory {
 				
 				// 使用默认的本地缓存方案
 				cacheStorageService = CacheStorageServiceLocalImpl.getInstance();
-				cacheLog.info("采用了默认的LocalImpl方案");
+				cacheLog.info("不使用Guava，采用了默认的LocalImpl方案");
 			}
 			
 			// 不采用本地方案，则顺序去遍历各种客户端：
@@ -80,7 +80,7 @@ public class SimpleCacheFactory {
 			// 最后做重复检查，如果都没有匹配到，则采用默认的本地实现
 			if ( null == cacheStorageService){
 				cacheStorageService = CacheStorageServiceLocalImpl.getInstance();
-				cacheLog.info("采用了默认的LocalImpl方案");
+				cacheLog.info("非本地缓存实例未找到，采用了默认的LocalImpl方案");
 			}
 			
 			// 将cacheStorageService注入到实际使用的SimpleCacheAspect类中去

@@ -83,10 +83,8 @@ public class CacheStorageServiceLocalImpl implements CacheStorageService {
 		
 		SoftReference<CacheInfoModel> cacheValueReference = cacheMap.get(cacheKey);
 		
-		// 通常SoftReference不应该为空，这里为了保护做一个检验，如果空了则提出出错
-		if(cacheValueReference==null){
-			sysLog.warn(Log4jUtil.getCallLocation() + " the SoftReference is null for key: " + cacheKey);
-			cacheMap.remove(cacheKey);
+		// 如果本身key就不存在，就会返回一个null
+		if(cacheValueReference==null){			
 			return null;
 		}
 		

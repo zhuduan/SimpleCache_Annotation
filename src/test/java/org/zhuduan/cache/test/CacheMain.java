@@ -17,18 +17,19 @@ import org.zhuduan.cache.SimpleCache;
 @Service
 public class CacheMain {
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws InterruptedException {
 		@SuppressWarnings("resource")
 		AbstractApplicationContext cxt = new ClassPathXmlApplicationContext("applicationContext.xml");
 		CacheMain service = (CacheMain) cxt.getBean(CacheMain.class);  
 		
 		System.out.println("start!");
 		for(int i=0;i<5;i++){
-			System.out.println(i+": "+service.testCache());
+			service.testCache();
+			Thread.sleep(1000);
 		}
 	}
 	
-	@SimpleCache(expire=60)
+	@SimpleCache(expire=2)
 	public String testCache(){
 		return "hello world";
 	}

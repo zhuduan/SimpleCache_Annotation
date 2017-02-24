@@ -17,7 +17,7 @@
 	default-autowire="byName" default-lazy-init="false">
 
 	<context:annotation-config />
-	<context:component-scan base-package="org.zhuduan.cache.test" />
+	<context:component-scan base-package="org.zhuduan.cache" />
 	
 	<!-- 当proxy-target-class为false时使用JDK动态代理,为true使用cglib -->
     <aop:aspectj-autoproxy proxy-target-class="true" />
@@ -50,8 +50,11 @@
 	<!-- 2. jedisCluster end -->
 	
 	<!-- 用户配属缓存插件 -->
-	<bean id="simpleCacheAspect" class="org.zhuduan.cache.SimpleCacheAspect">
-		<!-- <constructor-arg index="0" ref="jedisClusterCache" ></constructor-arg>-->
+	<bean id="SimpleCacheFactory" class="org.zhuduan.cache.SimpleCacheFactory">
+		<property name="useLocalCache" value="false"></property>
+		<property name="useGuava" value="true"></property>
+		<property name="useGuavaOrigin" value="true"></property>
+		<property name="jedisCluster" ref="jedisClusterCache"></property>
 	</bean>
 	
 </beans>

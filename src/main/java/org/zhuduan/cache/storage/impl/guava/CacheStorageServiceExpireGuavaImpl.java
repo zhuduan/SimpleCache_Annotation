@@ -67,9 +67,14 @@ public class CacheStorageServiceExpireGuavaImpl implements CacheStorageService {
 		
 		try {
 			CacheInfoModel infoModel = cahceBuilder.get(cacheKey);
+			
+			// key本身不存在
+			if ( infoModel==null ){
+				return null;
+			}
+			
 			// 如果信息不存在或者已经过期
-			if(infoModel==null 
-					|| infoModel.getCacheValue()==null
+			if ( infoModel.getCacheValue()==null
 					|| infoModel.getCacheBeginTimeLong()==null
 					|| infoModel.getCacheExpireTimeLong()==null 
 					|| ((System.currentTimeMillis() - infoModel.getCacheBeginTimeLong())>infoModel.getCacheExpireTimeLong()))

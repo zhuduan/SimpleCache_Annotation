@@ -21,11 +21,6 @@ import org.zhuduan.utils.SerializeUtils;
  * 配置@SimpleCache 注解的切面, 在方法上使用了@SimpleCache表示就使用了该切面 
  * 切面使用了Around的方式
  * 
- * 在使用时，会根据构造器的传入参数来重载不同的构造器，从而使用不同的CacheStorageServiceImpl实例
- * CacheStorageServiceImpl实例会采用不同的实现方式
- *     CacheStorageServiceLocalImpl -> 采用本地的ConcurrentHashMap实现缓存 （默认方式）
- *     CacheStorageServiceRedisImpl -> 采用Redis来实现缓存
- * 
  * 
  * @author	zhuhaifeng
  * @date	2017年2月16日
