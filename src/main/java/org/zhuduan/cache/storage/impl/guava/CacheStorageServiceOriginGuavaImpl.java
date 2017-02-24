@@ -18,7 +18,7 @@ import com.google.common.cache.CacheBuilder;
  * 
  * 使用原生的GuavaCache来缓存信息，只是在这个基础上进行了简单的使用包装
  * 考虑到GuavaCache的一些特性，采用如下配置：
- * 		1.采用WeakReference
+ * 		1.采用SoftReference
  * 		2.Access和Write过期时间在SimpleCacheConfig中进行统一配置
  * 
  * 

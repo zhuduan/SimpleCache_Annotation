@@ -20,7 +20,7 @@ import com.google.common.cache.CacheBuilder;
  * 但是通过将String包装成CacheInfoModel实现了get前先验证数据是否过期，来实现不同key可以用不同的过期时间设置
  * 其中在使用GuavaCache时：
  * 		1.因为自定义了过期时间，因此没有涉及guava自身的expire time（Access和Write都是）
- * 		2.为了应对极端场景，使用了guava的WeakReference设置（可能会带来缓存命中稍差，但是能有效在缓存吃紧情况下保证程序健壮性）
+ * 		2.为了应对极端场景，使用了guava的SoftReference设置（可能会带来缓存命中稍差，但是能有效在缓存吃紧情况下保证程序健壮性）
  * 
  * 
  * @author	zhuhaifeng

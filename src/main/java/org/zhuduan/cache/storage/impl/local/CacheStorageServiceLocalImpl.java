@@ -20,7 +20,7 @@ import com.google.common.base.Strings;
  * 						因为concurrentHashMap的原因，也不能简单的采用了SoftReference来处理
  *                      虽然ConcurrentHashMap的桶策略保证了写的一致性问题，但是读的时候可能会因为写锁导致的脏读（因为读未加锁）
  *                      （但是考虑到一般场景下的读取数据准确性要求，暂时不考虑这个场景的问题）
- *      相对Guava的LocalCache实现还是存在很大差距，比如数据的刷新机制、WeakReference等、hit命中率统计、LRU等策略等
+ *      相对Guava的LocalCache实现还是存在差异，比如数据的刷新机制、hit命中率统计、LRU等策略等
  *      但是优点是实现比较简单，无需其它第三方包引用
  *      可以作为缺省的实现方案（在初始化参数错误或者无更多配置信息时使用）
  * 
