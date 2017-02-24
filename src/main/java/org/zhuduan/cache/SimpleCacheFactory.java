@@ -46,39 +46,32 @@ public class SimpleCacheFactory {
 	 * 
 	 */
 	public SimpleCacheFactory(Boolean useLocalCache, Boolean useGuava, Boolean useGuavaOrigin, JedisCluster jedisclustr){
-		// 从配置文件中读入配置参数
 		this.useLocalCache = useLocalCache;
 		this.useGuava = useGuava;
 		this.useGuavaOrigin = useGuavaOrigin;
 		this.jedisCluster = jedisclustr;
 		
-		// 进行初始化
 		initial();
 	}	
 	
 	
 	public SimpleCacheFactory(Boolean useLocalCache, Boolean useGuava, Boolean useGuavaOrigin){
-		// 从配置文件中读入配置参数
 		this.useLocalCache = useLocalCache;
 		this.useGuava = useGuava;
 		this.useGuavaOrigin = useGuavaOrigin;
 		
-		// 进行初始化
 		initial();
 	}
 	
 	
 	public SimpleCacheFactory(JedisCluster jedisclustr){
-		// 从配置文件中读入配置参数
 		this.jedisCluster = jedisclustr;
 		
-		// 进行初始化
 		initial();
 	}
 	
 	
 	public SimpleCacheFactory(){		
-		// 进行初始化
 		initial();
 	}
 	
@@ -86,23 +79,19 @@ public class SimpleCacheFactory {
 	// 完成对参数的初始化
 	private void initial(){
 		// 根据不同的参数进行cacheAspect中的storage装配 --- 采用策略模式
-		// 		重复调用该构造参数，可能造成storage实现更换导致的部分缓存数据丢失
-		// 		（不过在该场景下问题不大，一般只会在spring注入时一起完成构造）
 		synchronized (SimpleCacheFactory.class) {
 			CacheStorageService cacheStorageService = null;			
 			// 如果采用本地缓存方案
 			if ( true == useLocalCache ){
 				if ( true == useGuava ){
-					// 使用原生Guava方案
 					if ( true == useGuavaOrigin ){
 						//TODO: 做一个带有重载参数的
 						cacheStorageService = CacheStorageServiceOriginGuavaImpl.getInstance();
 						cacheLog.info("采用了原生的GuavaCache方案");
+					} else{					
+						cacheStorageService = CacheStorageServiceExpireGuavaImpl.getInstance();
+						cacheLog.info("采用了定义expireTime的GuavaCache方案");
 					}
-					
-					// 使用可以支持不同Expire策略的Guava方案
-					cacheStorageService = CacheStorageServiceExpireGuavaImpl.getInstance();
-					cacheLog.info("采用了定义expireTime的GuavaCache方案");
 				} else {				
 					// 使用默认的本地缓存方案
 					cacheStorageService = CacheStorageServiceLocalImpl.getInstance();
@@ -112,8 +101,7 @@ public class SimpleCacheFactory {
 			
 			// 不采用本地方案，则顺序去遍历各种客户端：
 			//		Redis > Memcache(未实现) > others(未实现) > default
-			// Redis的装配
-			else{
+			else {
 				if ( jedisCluster != null ){			
 					try {
 						cacheStorageService = CacheStorageServiceRedisImpl.getInstance(jedisCluster);

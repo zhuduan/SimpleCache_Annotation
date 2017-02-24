@@ -27,7 +27,7 @@ public class CacheMain {
 		System.out.println("isUseGuava "+factory.isUseGuava());
 		
 		System.out.println("start!");
-		for(int i=0;i<5;i++){
+		for(int i=0;i<6;i++){
 			service.testCache();
 			Thread.sleep(1000);
 		}

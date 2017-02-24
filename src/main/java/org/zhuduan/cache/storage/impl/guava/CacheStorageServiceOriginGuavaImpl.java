@@ -108,8 +108,7 @@ public class CacheStorageServiceOriginGuavaImpl implements CacheStorageService {
 									.maximumSize(SimpleCacheConfig.ORIGIN_GUAVACACHE_OBJECT_NUM_MAX)
 									.expireAfterAccess(SimpleCacheConfig.ORIGIN_GUAVACACHE_ACCESS_EXPIRE_SECONDS, TimeUnit.SECONDS)
 									.expireAfterWrite(SimpleCacheConfig.ORIGIN_GUAVACACHE_WRITE_EXPIRE_SECONDS, TimeUnit.SECONDS)
-									.weakKeys()
-									.weakValues()
+									.softValues()
 							        .build();  
 	}
 	

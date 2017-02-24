@@ -145,8 +145,7 @@ public class CacheStorageServiceExpireGuavaImpl implements CacheStorageService {
 	public CacheStorageServiceExpireGuavaImpl(){
 		this.guavaCache =CacheBuilder.newBuilder()
 				.maximumSize(SimpleCacheConfig.EXPIRE_GUAVACACHE_OBJECT_NUM_MAX)
-				.weakKeys()
-				.weakValues()
+				.softValues()
 		        .build();  
 	}
 }
