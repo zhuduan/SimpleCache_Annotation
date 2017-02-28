@@ -1,0 +1,4 @@
+2017-02-24 10:40:36,582 - CACHE [main] INFO   - 采用了默认的LocalImpl方案
+2017-02-24 10:40:36,582 - CACHE [main] INFO   - 完成对SimpleCacheAspect中CacheStorageService的注入~
+2017-02-24 10:44:15,181 - CACHE [main] INFO   - 采用了默认的LocalImpl方案
+2017-02-24 10:44:15,181 - CACHE [main] INFO   - 完成对SimpleCacheAspect中CacheStorageService的注入~

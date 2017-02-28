@@ -16,8 +16,8 @@
 	http://www.springframework.org/schema/aop/spring-aop-2.5.xsd"
 	default-autowire="byName" default-lazy-init="false">
 
-	<context:annotation-config />
-	<context:component-scan base-package="org.zhuduan.cache" />
+	<context:annotation-config />	
+	<context:component-scan base-package="org.zhuduan.cache.test" />
 	
 	<!-- 当proxy-target-class为false时使用JDK动态代理,为true使用cglib -->
     <aop:aspectj-autoproxy proxy-target-class="true" />
@@ -50,11 +50,12 @@
 	<!-- 2. jedisCluster end -->
 	
 	<!-- 用户配属缓存插件 -->
-	<bean id="SimpleCacheFactory" class="org.zhuduan.cache.SimpleCacheFactory">
+	<bean id="SimpleCacheAspect" class="org.zhuduan.cache.SimpleCacheAspect">
 		<constructor-arg index="0" value="true"></constructor-arg><!-- useLocalCache  -->
 		<constructor-arg index="1" value="true"></constructor-arg><!-- useGuava  -->
-		<constructor-arg index="2" value="true"></constructor-arg><!-- useGuavaOrigin  -->
+		<constructor-arg index="2" value="false"></constructor-arg><!-- useGuavaOrigin  -->
 		<constructor-arg index="3" ref="jedisClusterCache"></constructor-arg><!-- jedisCluster  -->		
 	</bean>
+	
 	
 </beans>

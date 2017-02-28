@@ -11,8 +11,15 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.stereotype.Component;
 import org.zhuduan.cache.storage.CacheStorageService;
+import org.zhuduan.cache.storage.impl.guava.CacheStorageServiceExpireGuavaImpl;
+import org.zhuduan.cache.storage.impl.guava.CacheStorageServiceOriginGuavaImpl;
+import org.zhuduan.cache.storage.impl.local.CacheStorageServiceLocalImpl;
+import org.zhuduan.cache.storage.impl.redis.CacheStorageServiceRedisImpl;
+import org.zhuduan.utils.CacheException;
 import org.zhuduan.utils.Log4jUtil;
 import org.zhuduan.utils.SerializeUtils;
+
+import redis.clients.jedis.JedisCluster;
 
 
 /***
@@ -31,18 +38,102 @@ public class SimpleCacheAspect {
 	
 	private static final Logger cacheLog = Log4jUtil.cacheLog;	
 	
-    private static CacheStorageService cacheStorageService;			// 实际上用于缓存存储的实例类        
+	private volatile boolean 		useLocalCache	=	false;			// 使用的是否是本地缓存？（推荐有限使用在线缓存如Redis等）
+	
+	private volatile boolean 		useGuava		=	false;			// 本地缓存是否使用guava
+	
+	private volatile boolean 		useGuavaOrigin	=	false;			// 是否直接使用原生的guava（key和value都是weakReference，但是不支持差异化的expiretime）
+	
+	private volatile JedisCluster	jedisCluster	=	null;			// 可以使用的JedisCluster（如果没有则会选择其他方式）
+	
+    private volatile static CacheStorageService cacheStorageService;	// 实际上用于缓存存储的实例类            
     
     
     /***
-     * 采用默认实现方式的构造器
-     * 如果采用其它的storage实现，则会通过factory类来进行注入即可
-     * 该缓存实现主体类，不需要知道具体使用的缓存是哪一个
-     * 
-     */
-    public SimpleCacheAspect(){
-    	
-    }
+	 * 实际的构造器： 会根据不同properities参数来装配不同的Storage实现、
+	 * 
+	 */
+	public SimpleCacheAspect(Boolean useLocalCache, Boolean useGuava, Boolean useGuavaOrigin, JedisCluster jedisclustr){
+		this.useLocalCache = useLocalCache;
+		this.useGuava = useGuava;
+		this.useGuavaOrigin = useGuavaOrigin;
+		this.jedisCluster = jedisclustr;
+		
+		initial();
+	}	
+	
+	
+	public SimpleCacheAspect(Boolean useLocalCache, Boolean useGuava, Boolean useGuavaOrigin){
+		this.useLocalCache = useLocalCache;
+		this.useGuava = useGuava;
+		this.useGuavaOrigin = useGuavaOrigin;
+		
+		initial();
+	}
+	
+	
+	public SimpleCacheAspect(JedisCluster jedisclustr){
+		this.jedisCluster = jedisclustr;
+		
+		initial();
+	}
+	
+	
+	public SimpleCacheAspect(){		
+		initial();
+	}
+	
+	
+	// 完成对参数的初始化
+	private void initial(){
+		// 根据不同的参数进行cacheAspect中的storage装配 --- 采用策略模式
+		synchronized (SimpleCacheAspect.class) {
+			CacheStorageService cacheStorageService = null;			
+			// 如果采用本地缓存方案
+			if ( true == useLocalCache ){
+				if ( true == useGuava ){
+					if ( true == useGuavaOrigin ){
+						//TODO: 做一个带有重载参数的
+						cacheStorageService = CacheStorageServiceOriginGuavaImpl.getInstance();
+						cacheLog.info("采用了原生的GuavaCache方案");
+					} else{					
+						cacheStorageService = CacheStorageServiceExpireGuavaImpl.getInstance();
+						cacheLog.info("采用了定义expireTime的GuavaCache方案");
+					}
+				} else {				
+					// 使用默认的本地缓存方案
+					cacheStorageService = CacheStorageServiceLocalImpl.getInstance();
+					cacheLog.info("不使用Guava，采用了默认的LocalImpl方案");
+				}
+			}
+			
+			// 不采用本地方案，则顺序去遍历各种客户端：
+			//		Redis > Memcache(未实现) > others(未实现) > default
+			else {
+				if ( jedisCluster != null ){			
+					try {
+						cacheStorageService = CacheStorageServiceRedisImpl.getInstance(jedisCluster);
+					} catch (CacheException e) {
+						cacheStorageService = CacheStorageServiceLocalImpl.getInstance();
+						cacheLog.error("捕获到jedisCluster为空，退化为默认的LocalImpl方案");
+					}
+				}
+			
+				// TODO: MemCache的装配
+				//		 暂未实现
+			}
+			
+			// 最后做重复检查，如果都没有匹配到，则采用默认的本地实现
+			if ( null == cacheStorageService){
+				cacheStorageService = CacheStorageServiceLocalImpl.getInstance();
+				cacheLog.info("非本地缓存实例未找到，采用了默认的LocalImpl方案");
+			}
+			
+			// 将cacheStorageService注入到实际使用的SimpleCacheAspect类中去
+			SimpleCacheAspect.setCacheStorageService(cacheStorageService);
+			cacheLog.info("完成对SimpleCacheAspect中CacheStorageService的注入~");
+		}
+	}
     
 	
 	/** 
@@ -114,9 +205,44 @@ public class SimpleCacheAspect {
 		return cacheStorageService;
 	}
 
-
 	public static void setCacheStorageService(CacheStorageService cacheStorageService) {
 		SimpleCacheAspect.cacheStorageService = cacheStorageService;
+	}
+
+	public boolean isUseLocalCache() {
+		return useLocalCache;
+	}
+
+	public void setUseLocalCache(boolean useLocalCache) {
+		this.useLocalCache = useLocalCache;
+	}
+
+	public boolean isUseGuava() {
+		return useGuava;
+	}
+
+	public void setUseGuava(boolean useGuava) {
+		this.useGuava = useGuava;
+	}
+
+	public boolean isUseGuavaOrigin() {
+		return useGuavaOrigin;
+	}
+
+	public void setUseGuavaOrigin(boolean useGuavaOrigin) {
+		this.useGuavaOrigin = useGuavaOrigin;
+	}
+
+	public JedisCluster getJedisCluster() {
+		return jedisCluster;
+	}
+
+	public void setJedisCluster(JedisCluster jedisCluster) {
+		this.jedisCluster = jedisCluster;
+	}
+
+	public static Logger getCachelog() {
+		return cacheLog;
 	}
 
 
