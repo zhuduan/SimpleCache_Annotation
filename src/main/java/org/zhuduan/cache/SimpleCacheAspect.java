@@ -46,7 +46,7 @@ public class SimpleCacheAspect {
 	
 	private volatile JedisCluster	jedisCluster	=	null;			// 可以使用的JedisCluster（如果没有则会选择其他方式）
 	
-    private volatile static CacheStorageService cacheStorageService;	// 实际上用于缓存存储的实例类            
+    private static CacheStorageService cacheStorageService;				// 实际上用于缓存存储的实例类            
     
     
     /***
@@ -88,7 +88,6 @@ public class SimpleCacheAspect {
 	private void initial(){
 		// 根据不同的参数进行cacheAspect中的storage装配 --- 采用策略模式
 		synchronized (SimpleCacheAspect.class) {
-			CacheStorageService cacheStorageService = null;			
 			// 如果采用本地缓存方案
 			if ( true == useLocalCache ){
 				if ( true == useGuava ){
