@@ -4,7 +4,6 @@ import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.stereotype.Service;
 import org.zhuduan.cache.SimpleCache;
-import org.zhuduan.cache.SimpleCacheAspect;
 
 
 /***
@@ -22,9 +21,6 @@ public class CacheMain {
 		@SuppressWarnings("resource")
 		AbstractApplicationContext cxt = new ClassPathXmlApplicationContext("applicationContext.xml");
 		CacheMain service = (CacheMain) cxt.getBean(CacheMain.class);  
-		
-		SimpleCacheAspect aspect = cxt.getBean(SimpleCacheAspect.class);  		
-		System.out.println("isUseGuava "+aspect.isUseGuava());
 		
 		System.out.println("start!");
 		for(int i=0;i<6;i++){

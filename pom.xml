@@ -6,7 +6,7 @@
   
   <properties>
   	<spring.version>4.1.3.RELEASE</spring.version>
-  	<aspectj.version>1.6.9</aspectj.version>
+  	<aspectj.version>1.8.9</aspectj.version>
   	<cglib.version>2.2.2</cglib.version>
   	<slf4j.version>1.7.12</slf4j.version>
   	<junit.version>4.12</junit.version>
@@ -45,6 +45,16 @@
 		<artifactId>aspectjweaver</artifactId>
 		<version>${aspectj.version}</version>
 	</dependency>
+	<dependency>
+        <groupId>org.aspectj</groupId>
+        <artifactId>aspectjtools</artifactId>
+        <version>${aspectj.version}</version>
+    </dependency>
+    <dependency>
+	    <groupId>org.aspectj</groupId>
+	    <artifactId>aspectjrt</artifactId>
+	    <version>${aspectj.version}</version>
+    </dependency>
 	<dependency>
 		<groupId>cglib</groupId>
 		<artifactId>cglib</artifactId>

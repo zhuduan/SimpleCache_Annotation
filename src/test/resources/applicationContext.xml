@@ -20,7 +20,9 @@
 	<context:component-scan base-package="org.zhuduan.cache.test" />
 	
 	<!-- 当proxy-target-class为false时使用JDK动态代理,为true使用cglib -->
-    <aop:aspectj-autoproxy proxy-target-class="true" />
+    <aop:aspectj-autoproxy proxy-target-class="true" >
+    	<aop:include name="SimpleCacheAspect"/>
+    </aop:aspectj-autoproxy>
 
 	<context:property-placeholder location="classpath*:*.properties" />	
 	
