@@ -46,16 +46,6 @@
 		<version>${aspectj.version}</version>
 	</dependency>
 	<dependency>
-        <groupId>org.aspectj</groupId>
-        <artifactId>aspectjtools</artifactId>
-        <version>${aspectj.version}</version>
-    </dependency>
-    <dependency>
-	    <groupId>org.aspectj</groupId>
-	    <artifactId>aspectjrt</artifactId>
-	    <version>${aspectj.version}</version>
-    </dependency>
-	<dependency>
 		<groupId>cglib</groupId>
 		<artifactId>cglib</artifactId>
 		<version>${cglib.version}</version>
@@ -108,27 +98,7 @@
 	          <source>1.7</source>
 	          <target>1.7</target>
 	        </configuration>
-	      </plugin>
-	      <plugin>
-	        <groupId>org.codehaus.mojo</groupId>
-	        <artifactId>aspectj-maven-plugin</artifactId>
-	        <version>1.9</version>
-	        <configuration>
-	        	<weaveDependencies>
-		            <weaveDependency>
-		             <groupId>org.zhuduan</groupId>
-					  <artifactId>SimpleCache_Annotation</artifactId>
-		            </weaveDependency>		            
-		         </weaveDependencies>	          
-	        </configuration>
-	        <executions>
-	          <execution>
-	            <goals>
-	              <goal>compile</goal>
-	            </goals>
-	          </execution>
-	        </executions>
-	      </plugin>
+	      </plugin>	      
 	    </plugins>
     </pluginManagement>
   </build>
