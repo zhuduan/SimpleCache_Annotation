@@ -50,7 +50,7 @@ public class SimpleCacheAspect {
     
     
     /***
-	 * 实际的构造器： 会根据不同properities参数来装配不同的Storage实现、
+	 * 实际的构造器： 会根据不同properities参数来装配不同的Storage实现
 	 * 
 	 */
 	public SimpleCacheAspect(Boolean useLocalCache, Boolean useGuava, Boolean useGuavaOrigin, JedisCluster jedisclustr){
@@ -169,7 +169,6 @@ public class SimpleCacheAspect {
 			final Object cacheObj = SerializeUtils.deserialize(cacheValue, cacheClazz);
 			final long time_2 = System.currentTimeMillis();
 			cacheLog.info("hit cacheKey:" + cacheKey + ", cacheValueAlready:" + cacheValue+", ms:" + (time_2-time_1));
-			System.out.println("hit cacheKey:" + cacheKey + ", cacheValueAlready:" + cacheValue+", ms:" + (time_2-time_1));
 			return cacheObj;
 		} 
 		
@@ -191,8 +190,6 @@ public class SimpleCacheAspect {
 			cacheStorageService.setCache(cacheKey, cacheValueSave, expire);
 			final long time_5 = System.currentTimeMillis();
 			cacheLog.info("set cacheKey:" + cacheKey+", cacheValueSave:"+cacheValueSave + ", expire s:" + expire 
-						+ ", setCache ms:" + (time_5 - time_4) + ", db ms:" + (time_4 - time_3));
-			System.out.println("set cacheKey:" + cacheKey+", cacheValueSave:"+cacheValueSave + ", expire s:" + expire 
 						+ ", setCache ms:" + (time_5 - time_4) + ", db ms:" + (time_4 - time_3));
 		}
 		return dbExecuteValue;

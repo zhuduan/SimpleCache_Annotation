@@ -1,5 +1,15 @@
 package org.zhuduan.utils;
 
+/***
+ * 
+ * 用于Cache工程中所用到的一些常量信息的配置
+ * 如：错误信息码等
+ *  
+ * 
+ * @author	zhuhaifeng
+ * @date	2017年3月4日
+ *
+ */
 public class CacheConstants {
 
 	public static final int	EXCEPTION_INITIAL_PARAM			=	1;				// 初始化时参数错误
