@@ -24,14 +24,14 @@ public class CacheMain {
 		
 		System.out.println("start!");
 		for(int i=0;i<6;i++){
-			service.testCache();
+			System.out.println(i+":"+service.testCache().toString());
 			Thread.sleep(1000);
 		}
 	}
 	
 	@SimpleCache(expire=2)
-	public String testCache(){
-		return "hello world";
+	public TestPojo testCache(){
+		return (new TestPojo());
 	}
 
 }

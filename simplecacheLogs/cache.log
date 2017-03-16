@@ -2,3 +2,43 @@
 2017-02-24 10:40:36,582 - CACHE [main] INFO   - 完成对SimpleCacheAspect中CacheStorageService的注入~
 2017-02-24 10:44:15,181 - CACHE [main] INFO   - 采用了默认的LocalImpl方案
 2017-02-24 10:44:15,181 - CACHE [main] INFO   - 完成对SimpleCacheAspect中CacheStorageService的注入~
+2017-03-16 10:24:53,224 - CACHE [main] INFO   - 采用了定义expireTime的GuavaCache方案
+2017-03-16 10:24:53,225 - CACHE [main] INFO   - 完成对SimpleCacheAspect中CacheStorageService的注入~
+2017-03-16 10:24:53,314 - CACHE [main] INFO   - set cacheKey:cache.CacheMain_testCache, cacheValueSave:"hello world", expire s:2, setCache ms:58, db ms:18
+2017-03-16 10:24:54,389 - CACHE [main] INFO   - hit cacheKey:cache.CacheMain_testCache, cacheValueAlready:"hello world", ms:75
+2017-03-16 10:24:55,459 - CACHE [main] INFO   - set cacheKey:cache.CacheMain_testCache, cacheValueSave:"hello world", expire s:2, setCache ms:0, db ms:0
+2017-03-16 10:24:56,460 - CACHE [main] INFO   - hit cacheKey:cache.CacheMain_testCache, cacheValueAlready:"hello world", ms:0
+2017-03-16 10:24:57,460 - CACHE [main] INFO   - set cacheKey:cache.CacheMain_testCache, cacheValueSave:"hello world", expire s:2, setCache ms:0, db ms:0
+2017-03-16 10:24:58,462 - CACHE [main] INFO   - hit cacheKey:cache.CacheMain_testCache, cacheValueAlready:"hello world", ms:0
+2017-03-16 10:52:53,568 - CACHE [main] INFO   - 采用了定义expireTime的GuavaCache方案
+2017-03-16 10:52:53,569 - CACHE [main] INFO   - 完成对SimpleCacheAspect中CacheStorageService的注入~
+2017-03-16 10:52:53,644 - CACHE [main] INFO   - set cacheKey:cache.CacheMain_testCache, cacheValueSave:"hello world", expire s:2, setCache ms:48, db ms:14
+2017-03-16 10:52:54,700 - CACHE [main] INFO   - hit cacheKey:cache.CacheMain_testCache, cacheValueAlready:"hello world", ms:55
+2017-03-16 10:52:55,734 - CACHE [main] INFO   - set cacheKey:cache.CacheMain_testCache, cacheValueSave:"hello world", expire s:2, setCache ms:0, db ms:0
+2017-03-16 10:52:56,735 - CACHE [main] INFO   - hit cacheKey:cache.CacheMain_testCache, cacheValueAlready:"hello world", ms:0
+2017-03-16 10:52:57,736 - CACHE [main] INFO   - set cacheKey:cache.CacheMain_testCache, cacheValueSave:"hello world", expire s:2, setCache ms:0, db ms:0
+2017-03-16 10:52:58,737 - CACHE [main] INFO   - hit cacheKey:cache.CacheMain_testCache, cacheValueAlready:"hello world", ms:0
+2017-03-16 10:54:17,804 - CACHE [main] INFO   - 采用了定义expireTime的GuavaCache方案
+2017-03-16 10:54:17,805 - CACHE [main] INFO   - 完成对SimpleCacheAspect中CacheStorageService的注入~
+2017-03-16 10:54:17,894 - CACHE [main] INFO   - set cacheKey:cache.CacheMain_testCache, cacheValueSave:{"@type":"org.zhuduan.cache.test.TestPojo"}, expire s:2, setCache ms:64, db ms:12
+2017-03-16 10:54:18,930 - CACHE [main] INFO   - hit cacheKey:cache.CacheMain_testCache, cacheValueAlready:{"@type":"org.zhuduan.cache.test.TestPojo"}, ms:36
+2017-03-16 10:54:19,971 - CACHE [main] INFO   - set cacheKey:cache.CacheMain_testCache, cacheValueSave:{"@type":"org.zhuduan.cache.test.TestPojo"}, expire s:2, setCache ms:0, db ms:0
+2017-03-16 10:54:20,971 - CACHE [main] INFO   - hit cacheKey:cache.CacheMain_testCache, cacheValueAlready:{"@type":"org.zhuduan.cache.test.TestPojo"}, ms:0
+2017-03-16 10:54:21,972 - CACHE [main] INFO   - set cacheKey:cache.CacheMain_testCache, cacheValueSave:{"@type":"org.zhuduan.cache.test.TestPojo"}, expire s:2, setCache ms:0, db ms:0
+2017-03-16 10:54:22,973 - CACHE [main] INFO   - hit cacheKey:cache.CacheMain_testCache, cacheValueAlready:{"@type":"org.zhuduan.cache.test.TestPojo"}, ms:0
+2017-03-16 10:55:45,470 - CACHE [main] INFO   - 采用了定义expireTime的GuavaCache方案
+2017-03-16 10:55:45,470 - CACHE [main] INFO   - 完成对SimpleCacheAspect中CacheStorageService的注入~
+2017-03-16 10:55:45,561 - CACHE [main] INFO   - set cacheKey:cache.CacheMain_testCache, cacheValueSave:{"@type":"org.zhuduan.cache.test.TestPojo"}, expire s:2, setCache ms:65, db ms:14
+2017-03-16 10:55:46,611 - CACHE [main] INFO   - hit cacheKey:cache.CacheMain_testCache, cacheValueAlready:{"@type":"org.zhuduan.cache.test.TestPojo"}, ms:50
+2017-03-16 10:55:47,625 - CACHE [main] INFO   - set cacheKey:cache.CacheMain_testCache, cacheValueSave:{"@type":"org.zhuduan.cache.test.TestPojo"}, expire s:2, setCache ms:0, db ms:0
+2017-03-16 10:55:48,626 - CACHE [main] INFO   - hit cacheKey:cache.CacheMain_testCache, cacheValueAlready:{"@type":"org.zhuduan.cache.test.TestPojo"}, ms:0
+2017-03-16 10:55:49,627 - CACHE [main] INFO   - set cacheKey:cache.CacheMain_testCache, cacheValueSave:{"@type":"org.zhuduan.cache.test.TestPojo"}, expire s:2, setCache ms:0, db ms:0
+2017-03-16 10:55:50,629 - CACHE [main] INFO   - hit cacheKey:cache.CacheMain_testCache, cacheValueAlready:{"@type":"org.zhuduan.cache.test.TestPojo"}, ms:0
+2017-03-16 10:56:39,821 - CACHE [main] INFO   - 采用了定义expireTime的GuavaCache方案
+2017-03-16 10:56:39,822 - CACHE [main] INFO   - 完成对SimpleCacheAspect中CacheStorageService的注入~
+2017-03-16 10:56:39,912 - CACHE [main] INFO   - set cacheKey:cache.CacheMain_testCache, cacheValueSave:{"@type":"org.zhuduan.cache.test.TestPojo"}, expire s:2, setCache ms:64, db ms:14
+2017-03-16 10:56:40,958 - CACHE [main] INFO   - hit cacheKey:cache.CacheMain_testCache, cacheValueAlready:{"@type":"org.zhuduan.cache.test.TestPojo"}, ms:46
+2017-03-16 10:56:41,993 - CACHE [main] INFO   - set cacheKey:cache.CacheMain_testCache, cacheValueSave:{"@type":"org.zhuduan.cache.test.TestPojo"}, expire s:2, setCache ms:0, db ms:0
+2017-03-16 10:56:42,994 - CACHE [main] INFO   - hit cacheKey:cache.CacheMain_testCache, cacheValueAlready:{"@type":"org.zhuduan.cache.test.TestPojo"}, ms:0
+2017-03-16 10:56:43,994 - CACHE [main] INFO   - set cacheKey:cache.CacheMain_testCache, cacheValueSave:{"@type":"org.zhuduan.cache.test.TestPojo"}, expire s:2, setCache ms:0, db ms:0
+2017-03-16 10:56:44,995 - CACHE [main] INFO   - hit cacheKey:cache.CacheMain_testCache, cacheValueAlready:{"@type":"org.zhuduan.cache.test.TestPojo"}, ms:0

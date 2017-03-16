@@ -2,3 +2,13 @@
 2017-02-24 10:40:36,582 - SVC [Thread-3] INFO   - this time clean obj num : 0
 2017-02-24 10:44:15,180 - SVC [main] INFO   - org.zhuduan.cache.storage.impl.local.CacheStorageServiceLocalGuardThread#initial#112 successfully set map in reflection 
 2017-02-24 10:44:15,181 - SVC [Thread-3] INFO   - this time clean obj num : 0
+2017-03-16 10:24:55,459 - SVC [main] INFO   - clean obj in expire guava for key : cache.CacheMain_testCache
+2017-03-16 10:24:57,460 - SVC [main] INFO   - clean obj in expire guava for key : cache.CacheMain_testCache
+2017-03-16 10:52:55,733 - SVC [main] INFO   - clean obj in expire guava for key : cache.CacheMain_testCache
+2017-03-16 10:52:57,736 - SVC [main] INFO   - clean obj in expire guava for key : cache.CacheMain_testCache
+2017-03-16 10:54:19,971 - SVC [main] INFO   - clean obj in expire guava for key : cache.CacheMain_testCache
+2017-03-16 10:54:21,972 - SVC [main] INFO   - clean obj in expire guava for key : cache.CacheMain_testCache
+2017-03-16 10:55:47,625 - SVC [main] INFO   - clean obj in expire guava for key : cache.CacheMain_testCache
+2017-03-16 10:55:49,627 - SVC [main] INFO   - clean obj in expire guava for key : cache.CacheMain_testCache
+2017-03-16 10:56:41,992 - SVC [main] INFO   - clean obj in expire guava for key : cache.CacheMain_testCache
+2017-03-16 10:56:43,994 - SVC [main] INFO   - clean obj in expire guava for key : cache.CacheMain_testCache
